@@ -130,6 +130,9 @@ func (c *Challenge) Solve(authz acme.Authorization) error {
 	time.Sleep(interval)
 
 	err = wait.For("propagation", timeout, interval, func() (bool, error) {
+    fmt.Println("[VULTR] prop effFQDN: ", info.EffectiveFQDN)
+    fmt.Println("[VULTR] prop domain: ", domain)
+    fmt.Println("[VULTR] prop value: ", info.Value)
 		stop, errP := c.preCheck.call(domain, info.EffectiveFQDN, info.Value)
 		if !stop || errP != nil {
 			log.Infof("[%s] acme: Waiting for DNS record propagation.", domain)

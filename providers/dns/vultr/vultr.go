@@ -101,10 +101,18 @@ func (d *DNSProvider) Present(domain, token, keyAuth string) error {
 		return fmt.Errorf("vultr: %w", err)
 	}
 
-	subDomain, err := dns01.ExtractSubDomain(info.EffectiveFQDN, zoneDomain)
+  fmt.Println("[VULTR] effectiveFQDN: %s", info.EffectiveFQDN)
+  fmt.Println("[VULTR] zoneDomain: %s", zoneDomain)
+  fmt.Println("[VULTR] domain: %s", domain)
+
+	subDomain, err := dns01.ExtractSubDomain(domain, zoneDomain)
+  fmt.Println("[VULTR] subDomain: %s", subDomain)
 	if err != nil {
 		return fmt.Errorf("vultr: %w", err)
 	}
+
+  // https://www.eff.org/deeplinks/2018/02/technical-deep-dive-securing-automation-acme-dns-challenge-validation
+  subDomain = fmt.Sprintf("_acme-challenge.%s", subDomain)
 
 	req := govultr.DomainRecordReq{
 		Name:     subDomain,
@@ -126,10 +134,11 @@ func (d *DNSProvider) Present(domain, token, keyAuth string) error {
 func (d *DNSProvider) CleanUp(domain, token, keyAuth string) error {
 	ctx := context.Background()
 
-	info := dns01.GetChallengeInfo(domain, keyAuth)
+	// info := dns01.GetChallengeInfo(domain, keyAuth)
 
 	// TODO(ldez) replace domain by FQDN to follow CNAME.
-	zoneDomain, records, err := d.findTxtRecords(ctx, domain, info.EffectiveFQDN)
+  // zoneDomain, records, err := d.findTxtRecords(ctx, domain, info.EffectiveFQDN)
+	zoneDomain, records, err := d.findTxtRecords(ctx, domain, domain)
 	if err != nil {
 		return fmt.Errorf("vultr: %w", err)
 	}
@@ -191,15 +200,18 @@ func (d *DNSProvider) getHostedZone(ctx context.Context, domain string) (string,
 }
 
 func (d *DNSProvider) findTxtRecords(ctx context.Context, domain, fqdn string) (string, []govultr.DomainRecord, error) {
-	zoneDomain, err := d.getHostedZone(ctx, domain)
+  zoneDomain, err := d.getHostedZone(ctx, domain)
 	if err != nil {
 		return "", nil, err
 	}
 
-	subDomain, err := dns01.ExtractSubDomain(fqdn, zoneDomain)
+	subDomain, err := dns01.ExtractSubDomain(domain, zoneDomain)
 	if err != nil {
 		return "", nil, err
 	}
+
+  fmt.Println("[VULTR] subDomain: ", subDomain)
+  fmt.Println("[VULTR] zoneDomain: ", zoneDomain)
 
 	listOptions := &govultr.ListOptions{PerPage: 25}
 

@@ -102,6 +102,7 @@ func lookupNameservers(fqdn string) ([]string, error) {
 	}
 
 	r, err := dnsQuery(zone, dns.TypeNS, recursiveNameservers, true)
+
 	if err != nil {
 		return nil, fmt.Errorf("NS call failed: %w", err)
 	}
@@ -228,6 +229,7 @@ func dnsMsgContainsCNAME(msg *dns.Msg) bool {
 func dnsQuery(fqdn string, rtype uint16, nameservers []string, recursive bool) (*dns.Msg, error) {
 	m := createDNSMsg(fqdn, rtype, recursive)
 
+
 	if len(nameservers) == 0 {
 		return nil, &DNSError{Message: "empty list of nameservers"}
 	}
@@ -237,6 +239,8 @@ func dnsQuery(fqdn string, rtype uint16, nameservers []string, recursive bool) (
 	var errAll error
 
 	for _, ns := range nameservers {
+    fmt.Println("[DNS QUERY] nameserver: ", ns)
+
 		r, err = sendDNSQuery(m, ns)
 		if err == nil && len(r.Answer) > 0 {
 			break
@@ -244,6 +248,8 @@ func dnsQuery(fqdn string, rtype uint16, nameservers []string, recursive bool) (
 
 		errAll = errors.Join(errAll, err)
 	}
+
+  fmt.Println("[DNS QUERY] m: ", r.String())
 
 	if err != nil {
 		return r, errAll
