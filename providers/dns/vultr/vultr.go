@@ -134,11 +134,13 @@ func (d *DNSProvider) Present(domain, token, keyAuth string) error {
 func (d *DNSProvider) CleanUp(domain, token, keyAuth string) error {
 	ctx := context.Background()
 
-	// info := dns01.GetChallengeInfo(domain, keyAuth)
+	info := dns01.GetChallengeInfo(domain, keyAuth)
+  fmt.Println("[VULTR][CleanUp] ", info.EffectiveFQDN)
 
 	// TODO(ldez) replace domain by FQDN to follow CNAME.
-  // zoneDomain, records, err := d.findTxtRecords(ctx, domain, info.EffectiveFQDN)
-	zoneDomain, records, err := d.findTxtRecords(ctx, domain, domain)
+  zoneDomain, records, err := d.findTxtRecords(ctx, domain, info.EffectiveFQDN)
+
+  // zoneDomain, records, err := d.findTxtRecords(ctx, domain, domain)
 	if err != nil {
 		return fmt.Errorf("vultr: %w", err)
 	}
@@ -205,7 +207,8 @@ func (d *DNSProvider) findTxtRecords(ctx context.Context, domain, fqdn string) (
 		return "", nil, err
 	}
 
-	subDomain, err := dns01.ExtractSubDomain(domain, zoneDomain)
+	subDomain, err := dns01.ExtractSubDomain(fqdn, zoneDomain)
+
 	if err != nil {
 		return "", nil, err
 	}
