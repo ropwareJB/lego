@@ -245,6 +245,9 @@ func (d *DNSProvider) findTxtRecords(ctx context.Context, domain, fqdn string) (
 		listOptions.Cursor = meta.Links.Next
 	}
 
+  fmt.Println("[VULTR] end of findTxtRecords")
+  fmt.Println("[VULTR] findTxtRecords: ", fmt.Printf("%+v", records))
+
 	return zoneDomain, records, nil
 }
 
