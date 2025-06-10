@@ -14,7 +14,7 @@ func ExtractSubDomain(domain, zone string) (string, error) {
 
 	if canonDomain == canonZone {
 		// return "", fmt.Errorf("no subdomain because the domain and the zone are identical: %s", canonDomain)
-    return "@", nil
+    return "", nil
 	}
 
 	if !dns.IsSubDomain(canonZone, canonDomain) {
