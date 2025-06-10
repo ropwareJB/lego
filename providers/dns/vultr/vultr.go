@@ -248,7 +248,7 @@ func (d *DNSProvider) findTxtRecords(ctx context.Context, domain, fqdn string) (
 
   fmt.Println("[VULTR] end of findTxtRecords")
   for index, ele := range records {
-    fmt.Println("[VULTR] findTxtRecords: ", fmt.Printf("%+v", ele))
+    fmt.Println("[VULTR] findTxtRecords: ", ele)
   }
 
 	return zoneDomain, records, nil
