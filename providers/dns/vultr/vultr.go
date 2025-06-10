@@ -112,7 +112,12 @@ func (d *DNSProvider) Present(domain, token, keyAuth string) error {
 	}
 
   // https://www.eff.org/deeplinks/2018/02/technical-deep-dive-securing-automation-acme-dns-challenge-validation
-  subDomain = fmt.Sprintf("_acme-challenge.%s", subDomain)
+  // if we're requesting the apex domain, we don't need the
+  if subDomain == "" {
+    subDomain = "_acme-challenge"
+  } else {
+    subDomain = fmt.Sprintf("_acme-challenge.%s", subDomain)
+  }
 
 	req := govultr.DomainRecordReq{
 		Name:     subDomain,
@@ -121,6 +126,8 @@ func (d *DNSProvider) Present(domain, token, keyAuth string) error {
 		TTL:      d.config.TTL,
 		Priority: func(v int) *int { return &v }(0),
 	}
+
+  fmt.Println("[VULTR] req: %+v\n", req)
 
 	_, resp, err := d.client.DomainRecord.Create(ctx, zoneDomain, &req)
 	if err != nil {
