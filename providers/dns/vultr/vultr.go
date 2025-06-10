@@ -131,6 +131,7 @@ func (d *DNSProvider) Present(domain, token, keyAuth string) error {
 
 	_, resp, err := d.client.DomainRecord.Create(ctx, zoneDomain, &req)
 	if err != nil {
+    fmt.Println("[VULTR ERR] couldnt create")
 		return fmt.Errorf("vultr: %w", extendError(resp, err))
 	}
 
